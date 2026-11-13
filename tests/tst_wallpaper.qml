@@ -4,6 +4,8 @@ import "../plugin/contents/ui" as Plugin
 import "../plugin/contents/ui/CommandEntries.js" as Commands
 import "../plugin/contents/ui/PopupPlacement.js" as Placement
 import "../plugin/contents/ui/EntryColor.js" as Colors
+import "../plugin/contents/ui/Entries.js" as Hierarchy
+import "../plugin/contents/ui/Links.js" as Links
 
 TestCase {
     name: "WallpaperInteractions"
@@ -16,6 +18,7 @@ TestCase {
         id: canvas
         anchors.fill: parent
         visible: true
+        onRelatedSelectionCleared: relatedEntry = null
         entries: [
             {title: "left", description: "A", examples: ["exemple"], note: "Note", x: 100, y: 150, w: 200, h: 100},
             {title: "right", description: "B", examples: ["exemple"], note: "Note", x: 1350, y: 150, w: 200, h: 100}
@@ -53,6 +56,46 @@ TestCase {
         compare(commands, 54)
         verify(items.some(e => e.title === "whereis"))
     }
+    function test_hierarchy_and_links() {
+        compare(Hierarchy.entries.length, 24)
+        const dirs = Hierarchy.entries.filter(e => e.kind === "directory")
+        compare(dirs.length, 19)
+        verify(dirs.some(e => e.title === "/srv"))
+        for (const e of Hierarchy.entries) {
+            verify(e.description && e.examples.length && e.x >= 0 && e.y >= 0)
+            verify(e.x + e.w <= 1672 && e.y + e.h <= 941)
+        }
+        const montage = Commands.entriesFor().find(e => e.title === "Montage & Supports")
+        const related = Links.related(montage)
+        for (const title of ["/dev", "/media", "/mnt", "/run"]) {
+            verify(related.includes(title))
+            verify(Links.related(dirs.find(e => e.title === title)).includes("Montage & Supports"))
+        }
+    }
+    function test_carried_selection() {
+        canvas.fixedPanel = true
+        let montage = Commands.entriesFor().find(e => e.title === "Montage & Supports")
+        canvas.currentPage = 1
+        canvas.entries = [montage]
+        let hotspot = getHotspot("Montage & Supports")
+        verify(hotspot !== null)
+        canvas.toggleHotspot(hotspot)
+        canvas.relatedEntry = canvas.pinnedSelection()
+        canvas.resetHotspots()
+        canvas.currentPage = 0
+        canvas.entries = Hierarchy.entries
+        compare(canvas.relatedEntry.title, "Montage & Supports")
+        verify(canvas.relatedTitles.includes("/dev") && canvas.relatedTitles.includes("/mnt"))
+        verify(findChild(canvas, "fixedInfoPanel").visible)
+        canvas.forceActiveFocus()
+        keyClick(Qt.Key_Escape)
+        compare(canvas.relatedEntry, null)
+        compare(canvas.relatedTitles.length, 0)
+        canvas.entries = [
+            {title: "left", description: "A", examples: ["exemple"], note: "Note", x: 100, y: 150, w: 200, h: 100},
+            {title: "right", description: "B", examples: ["exemple"], note: "Note", x: 1350, y: 150, w: 200, h: 100}
+        ]
+    }
     function test_slide_direction() {
         slideDeck.page = 0
         compare(slideDeck.hierarchyOffset, 0)
@@ -62,8 +105,10 @@ TestCase {
         compare(slideDeck.commandsOffset, 0)
     }
     function test_colors() {
-        compare(Colors.forEntry({title: "/home", x: 389}), "#68ff52")
-        compare(Colors.forEntry({title: "/sys", x: 1358}), "#54eaff")
+        compare(Colors.forEntry({title: "/home", kind: "directory", x: 30}), "#3cb8ff")
+        compare(Colors.forEntry({title: "/sys", kind: "directory", x: 1027}), "#54eaff")
+        compare(Colors.forEntry({title: "/media", kind: "directory", x: 708}), "#ffb642")
+        compare(Colors.forEntry({title: "/srv", kind: "directory", x: 1357}), "#db74ff")
         compare(Colors.forEntry({title: "ps", kind: "command", x: 1017}), "#54eaff")
         compare(Colors.forEntry({title: "curl", kind: "command", x: 1349}), "#db74ff")
     }

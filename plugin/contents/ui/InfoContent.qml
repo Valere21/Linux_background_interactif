@@ -1,4 +1,5 @@
 import QtQuick
+import "Links.js" as Links
 
 Column {
     id: content
@@ -41,6 +42,15 @@ Column {
             wrapMode: Text.WrapAnywhere
             font.pixelSize: content.bodySize
         }
+    }
+    Text {
+        width: parent.width
+        readonly property var related: Links.related(content.entry)
+        visible: related.length > 0
+        text: (Links.onHierarchy(content.entry) ? "Commandes et modules associés : " : "Dossiers souvent liés : ") + related.join(", ")
+        color: content.accent
+        wrapMode: Text.WordWrap
+        font.pixelSize: 13
     }
     Text {
         width: parent.width

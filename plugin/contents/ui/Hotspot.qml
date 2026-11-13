@@ -30,7 +30,7 @@ Item {
     FolderHighlight {
         width: root.width
         height: root.height
-        active: root.shown
+        active: root.shown || canvas.relatedTitles.indexOf(root.entry.title) !== -1
         tint: root.tint
     }
     MouseArea {

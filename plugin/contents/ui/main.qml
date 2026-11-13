@@ -9,11 +9,13 @@ WallpaperItem {
     id: root
     property bool interactive: false
     property int page: 0
+    property var relatedEntry: null
     contextualActions: [toggleAction]
 
     function showPage(nextPage) {
         if (page === nextPage) return
-        imageCanvas.closeAll()
+        relatedEntry = imageCanvas.pinnedSelection()
+        imageCanvas.resetHotspots()
         page = nextPage
         transitionTimer.restart()
     }
@@ -25,6 +27,7 @@ WallpaperItem {
         onTriggered: root.interactive = !root.interactive
     }
     onInteractiveChanged: {
+        if (!interactive) relatedEntry = null
         if (interactive && !transitionTimer.running)
             Qt.callLater(() => { if (root.interactive && imageCanvas.visible) imageCanvas.forceActiveFocus() })
     }
@@ -67,9 +70,11 @@ WallpaperItem {
         visible: root.interactive && !transitionTimer.running
         entries: root.page === 0 ? Hierarchy.entries : Commands.entriesFor()
         referenceWidth: root.page === 0 ? 1672 : 1671
-        referenceHeight: root.page === 0 ? 930 : 941
+        referenceHeight: 941
         fixedPanel: true
         currentPage: root.page
+        relatedEntry: root.relatedEntry
+        onRelatedSelectionCleared: root.relatedEntry = null
         onPageRequested: requestedPage => root.showPage(requestedPage)
     }
 }

@@ -1,4 +1,6 @@
 import QtQuick
+import "Links.js" as Links
+import "EntryColor.js" as EntryColor
 
 Item {
     id: interactiveLayer
@@ -9,8 +11,15 @@ Item {
     property int currentPage: 0
     signal pageRequested(int page)
     property var activeHotspot: null
+    property var relatedEntry: null
+    readonly property var relatedTitles: !relatedEntry ? []
+        : ((currentPage === 0) === Links.onHierarchy(relatedEntry) ? [relatedEntry.title] : Links.related(relatedEntry))
+    signal relatedSelectionCleared()
 
-    function closeAll() {
+    function pinnedSelection() {
+        return activeHotspot && activeHotspot.pinned ? activeHotspot.entry : relatedEntry
+    }
+    function resetHotspots() {
         for (let i = 0; i < hotspots.count; ++i) {
             const hotspot = hotspots.itemAt(i)
             if (hotspot)
@@ -18,7 +27,13 @@ Item {
         }
         activeHotspot = null
     }
+    function closeAll() {
+        resetHotspots()
+        relatedSelectionCleared()
+    }
     function showHotspot(hotspot, force) {
+        if (relatedEntry && !force) return false
+        if (force && relatedEntry) relatedSelectionCleared()
         if (activeHotspot && activeHotspot !== hotspot && activeHotspot.pinned && !force)
             return false
         if (activeHotspot && activeHotspot !== hotspot)
@@ -61,9 +76,9 @@ Item {
             event.accepted = false
         }
     }
-    onVisibleChanged: if (!visible) closeAll()
-    onEntriesChanged: closeAll()
-    onFixedPanelChanged: closeAll()
+    onVisibleChanged: if (!visible) resetHotspots()
+    onEntriesChanged: resetHotspots()
+    onFixedPanelChanged: resetHotspots()
 
     Repeater {
         id: hotspots
@@ -81,12 +96,13 @@ Item {
     FixedInfoPanel {
         objectName: "fixedInfoPanel"
         z: 1000
-        visible: interactiveLayer.fixedPanel && interactiveLayer.activeHotspot !== null
-        entry: interactiveLayer.activeHotspot ? interactiveLayer.activeHotspot.entry : ({})
-        accent: interactiveLayer.activeHotspot ? interactiveLayer.activeHotspot.tint : "#54d9e6"
-        x: interactiveLayer.width * 580 / 1671
+        visible: interactiveLayer.fixedPanel && (interactiveLayer.activeHotspot !== null || interactiveLayer.relatedEntry !== null)
+        entry: interactiveLayer.activeHotspot ? interactiveLayer.activeHotspot.entry : (interactiveLayer.relatedEntry || ({}))
+        accent: interactiveLayer.activeHotspot ? interactiveLayer.activeHotspot.tint
+                : (interactiveLayer.relatedEntry ? EntryColor.forEntry(interactiveLayer.relatedEntry) : "#54d9e6")
+        x: interactiveLayer.width * 610 / 1672
         y: interactiveLayer.height * 720 / 941
-        width: interactiveLayer.width * 850 / 1671
+        width: interactiveLayer.width * 820 / 1672
         height: interactiveLayer.height * 195 / 941
     }
 }
