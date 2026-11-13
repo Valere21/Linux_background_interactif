@@ -1,0 +1,10 @@
+{
+    "KPackageStructure": "Plasma/Wallpaper",
+    "KPlugin": {
+        "Id": "org.don404.linuxhierarchy",
+        "Name": "Hiérarchie Linux interactive",
+        "Description": "Fond d'écran pédagogique interactif",
+        "Version": "1.0",
+        "License": "MIT"
+    }
+}

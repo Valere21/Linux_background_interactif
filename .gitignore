@@ -1,0 +1,9 @@
+# Qt Creator and CMake local files
+CMakeLists.txt.user*
+*.qmlproject.user*
+build/
+build-*/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+compile_commands.json
