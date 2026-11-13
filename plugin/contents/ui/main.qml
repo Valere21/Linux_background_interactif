@@ -10,6 +10,9 @@ WallpaperItem {
     property bool interactive: false
     property int page: 0
     property var relatedEntry: null
+    readonly property rect availableArea: root.parent && root.parent.availableScreenRect
+        && root.parent.availableScreenRect.width > 0 && root.parent.availableScreenRect.height > 0
+        ? root.parent.availableScreenRect : Qt.rect(0, 0, root.width, root.height)
     contextualActions: [toggleAction]
 
     function showPage(nextPage) {
@@ -38,7 +41,10 @@ WallpaperItem {
     }
     SlideDeck {
         id: slides
-        anchors.fill: parent
+        x: root.availableArea.x
+        y: root.availableArea.y
+        width: root.availableArea.width
+        height: root.availableArea.height
         page: root.page
     }
     InteractiveToggle {
@@ -66,7 +72,8 @@ WallpaperItem {
         z: 1000
         width: root.page === 0 ? slides.hierarchyPaintedWidth : slides.commandsPaintedWidth
         height: root.page === 0 ? slides.hierarchyPaintedHeight : slides.commandsPaintedHeight
-        anchors.centerIn: parent
+        x: root.x + slides.x + (slides.width - width) / 2
+        y: root.y + slides.y + slides.height - height
         visible: root.interactive && !transitionTimer.running
         entries: root.page === 0 ? Hierarchy.entries : Commands.entriesFor()
         referenceWidth: root.page === 0 ? 1672 : 1671

@@ -56,9 +56,13 @@ Item {
         }
     }
 
-    Keys.onEscapePressed: event => {
-        closeAll()
-        event.accepted = true
+    // A click on the desktop moves focus outside this layer. Escape must
+    // still dismiss its information, wherever focus is inside this window.
+    Shortcut {
+        sequence: "Escape"
+        context: Qt.WindowShortcut
+        enabled: interactiveLayer.visible
+        onActivated: interactiveLayer.closeAll()
     }
     Keys.onLeftPressed: event => {
         if (currentPage > 0) {

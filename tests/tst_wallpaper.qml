@@ -28,8 +28,14 @@ TestCase {
     SignalSpy { id: pageSpy; target: canvas; signalName: "pageRequested" }
     Item {
         id: otherFocus
+        x: 500; y: 10; width: 100; height: 60
+        z: 1
         property int presses: 0
         Keys.onRightPressed: event => { ++presses; event.accepted = true }
+        MouseArea {
+            anchors.fill: parent
+            onPressed: otherFocus.forceActiveFocus()
+        }
     }
     function getHotspot(title) {
         for (let i = 0; i < canvas.children.length; ++i) {
@@ -162,5 +168,33 @@ TestCase {
         verify(b.pinned && !a.pinned && canvas.activeHotspot === b)
         keyClick(Qt.Key_Escape)
         verify(!b.shown && !b.pinned && canvas.activeHotspot === null)
+    }
+    function test_escape_after_desktop_click_data() {
+        return [
+            { tag: "popup", fixed: false, carried: false },
+            { tag: "fixed panel", fixed: true, carried: false },
+            { tag: "selection carried to another page", fixed: true, carried: true }
+        ]
+    }
+    function test_escape_after_desktop_click(data) {
+        canvas.fixedPanel = data.fixed
+        const hotspot = getHotspot("left")
+        mouseMove(hotspot, 15, 15)
+        mouseClick(hotspot, 15, 15)
+        verify(hotspot.pinned && hotspot.shown)
+        if (data.carried) {
+            canvas.relatedEntry = canvas.pinnedSelection()
+            canvas.resetHotspots()
+        }
+        mouseClick(otherFocus, 10, 10)
+        verify(otherFocus.activeFocus)
+        verify(data.carried ? canvas.relatedEntry !== null : hotspot.pinned)
+        keyClick(Qt.Key_Escape)
+        verify(!hotspot.shown && !hotspot.pinned)
+        compare(canvas.activeHotspot, null)
+        compare(canvas.relatedEntry, null)
+        verify(!findChild(canvas, "fixedInfoPanel").visible)
+        // Closing a card must not steal focus back from the desktop.
+        verify(otherFocus.activeFocus)
     }
 }

@@ -19,6 +19,7 @@ Item {
         opacity: deck.page === 0 ? 1 : 0
         source: "../images/Hierarchie-Linux.png"
         fillMode: Image.PreserveAspectFit
+        verticalAlignment: Image.AlignBottom
         smooth: true
         Behavior on x { enabled: deck.animationsEnabled; NumberAnimation { duration: 280; easing.type: Easing.InOutCubic } }
         Behavior on opacity { enabled: deck.animationsEnabled; NumberAnimation { duration: 280 } }
@@ -30,6 +31,7 @@ Item {
         opacity: deck.page === 1 ? 1 : 0
         source: "../images/Commandes.png"
         fillMode: Image.PreserveAspectFit
+        verticalAlignment: Image.AlignBottom
         smooth: true
         Behavior on x { enabled: deck.animationsEnabled; NumberAnimation { duration: 280; easing.type: Easing.InOutCubic } }
         Behavior on opacity { enabled: deck.animationsEnabled; NumberAnimation { duration: 280 } }
