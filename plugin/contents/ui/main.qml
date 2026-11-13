@@ -31,13 +31,10 @@ WallpaperItem {
     }
     onInteractiveChanged: {
         if (!interactive) relatedEntry = null
-        if (interactive && !transitionTimer.running)
-            Qt.callLater(() => { if (root.interactive && imageCanvas.visible) imageCanvas.forceActiveFocus() })
     }
     Timer {
         id: transitionTimer
         interval: 300
-        onTriggered: if (root.interactive) imageCanvas.forceActiveFocus()
     }
     SlideDeck {
         id: slides
@@ -48,6 +45,7 @@ WallpaperItem {
         page: root.page
     }
     InteractiveToggle {
+        objectName: "interactiveToggle"
         parent: root.parent
         z: 1001
         anchors.left: parent.left
@@ -57,6 +55,7 @@ WallpaperItem {
         onActivationRequested: enabled => root.interactive = enabled
     }
     Controls.Button {
+        objectName: "pageButton"
         parent: root.parent
         z: 1001
         anchors.right: parent.right
@@ -68,6 +67,7 @@ WallpaperItem {
     }
     InteractiveCanvas {
         id: imageCanvas
+        objectName: "imageCanvas"
         parent: root.parent
         z: 1000
         width: root.page === 0 ? slides.hierarchyPaintedWidth : slides.commandsPaintedWidth
@@ -75,6 +75,7 @@ WallpaperItem {
         x: root.x + slides.x + (slides.width - width) / 2
         y: root.y + slides.y + slides.height - height
         visible: root.interactive && !transitionTimer.running
+        shortcutsEnabled: root.interactive
         entries: root.page === 0 ? Hierarchy.entries : Commands.entriesFor()
         referenceWidth: root.page === 0 ? 1672 : 1671
         referenceHeight: 941

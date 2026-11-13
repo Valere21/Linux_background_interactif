@@ -16,6 +16,7 @@ Rectangle {
         color: Qt.rgba(panel.accent.r, panel.accent.g, panel.accent.b, 0.10)
     }
     Controls.ScrollView {
+        objectName: "infoScroll"
         anchors.fill: parent
         anchors.margins: 12
         clip: true

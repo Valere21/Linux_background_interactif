@@ -9,6 +9,7 @@ Item {
     property real referenceHeight: 930
     property bool fixedPanel: false
     property int currentPage: 0
+    property bool shortcutsEnabled: visible
     signal pageRequested(int page)
     property var activeHotspot: null
     property var relatedEntry: null
@@ -40,7 +41,6 @@ Item {
             activeHotspot.close()
         activeHotspot = hotspot
         hotspot.shown = true
-        forceActiveFocus()
         return true
     }
     function clearHotspot(hotspot) {
@@ -56,29 +56,25 @@ Item {
         }
     }
 
-    // A click on the desktop moves focus outside this layer. Escape must
-    // still dismiss its information, wherever focus is inside this window.
+    // All wallpaper commands belong to the desktop window: clicking outside
+    // a hotspot or closing a card must not disable keyboard navigation.
     Shortcut {
         sequence: "Escape"
         context: Qt.WindowShortcut
-        enabled: interactiveLayer.visible
+        enabled: interactiveLayer.shortcutsEnabled
         onActivated: interactiveLayer.closeAll()
     }
-    Keys.onLeftPressed: event => {
-        if (currentPage > 0) {
-            pageRequested(0)
-            event.accepted = true
-        } else {
-            event.accepted = false
-        }
+    Shortcut {
+        sequence: "Left"
+        context: Qt.WindowShortcut
+        enabled: interactiveLayer.shortcutsEnabled
+        onActivated: if (interactiveLayer.currentPage > 0) interactiveLayer.pageRequested(0)
     }
-    Keys.onRightPressed: event => {
-        if (currentPage < 1) {
-            pageRequested(1)
-            event.accepted = true
-        } else {
-            event.accepted = false
-        }
+    Shortcut {
+        sequence: "Right"
+        context: Qt.WindowShortcut
+        enabled: interactiveLayer.shortcutsEnabled
+        onActivated: if (interactiveLayer.currentPage < 1) interactiveLayer.pageRequested(1)
     }
     onVisibleChanged: if (!visible) resetHotspots()
     onEntriesChanged: resetHotspots()

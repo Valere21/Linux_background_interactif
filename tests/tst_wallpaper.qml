@@ -120,8 +120,10 @@ TestCase {
         compare(Colors.forEntry({title: "ps", kind: "command", x: 1017}), "#54eaff")
         compare(Colors.forEntry({title: "curl", kind: "command", x: 1349}), "#db74ff")
     }
-    function test_arrow_keys_are_focus_scoped() {
-        canvas.forceActiveFocus()
+    function test_arrow_keys_work_with_desktop_focus() {
+        const previousPresses = otherFocus.presses
+        mouseClick(otherFocus, 10, 10)
+        verify(otherFocus.activeFocus)
         keyClick(Qt.Key_Right)
         compare(pageSpy.count, 1)
         compare(pageSpy.signalArguments[0][0], 1)
@@ -131,10 +133,21 @@ TestCase {
         keyClick(Qt.Key_Left)
         compare(pageSpy.count, 2)
         compare(pageSpy.signalArguments[1][0], 0)
-        otherFocus.forceActiveFocus()
         keyClick(Qt.Key_Right)
         compare(pageSpy.count, 2)
-        compare(otherFocus.presses, 1)
+        compare(otherFocus.presses, previousPresses)
+        verify(otherFocus.activeFocus)
+    }
+    function test_shortcuts_disabled_when_interactivity_hidden() {
+        const previousPresses = otherFocus.presses
+        mouseClick(otherFocus, 10, 10)
+        canvas.visible = false
+        keyClick(Qt.Key_Right)
+        keyClick(Qt.Key_Left)
+        keyClick(Qt.Key_Escape)
+        compare(pageSpy.count, 0)
+        compare(otherFocus.presses, previousPresses + 1)
+        canvas.visible = true
     }
     function test_popup_placement() {
         let right = Placement.place(20, 50, 120, 50, 240, 100, 800, 500)
@@ -196,5 +209,19 @@ TestCase {
         verify(!findChild(canvas, "fixedInfoPanel").visible)
         // Closing a card must not steal focus back from the desktop.
         verify(otherFocus.activeFocus)
+        // Escape and navigation must continue working in both directions,
+        // including after repeated dismissals without reopening a card.
+        for (let i = 0; i < 3; ++i) {
+            canvas.currentPage = 0
+            keyClick(Qt.Key_Right)
+            compare(pageSpy.count, i * 2 + 1)
+            compare(pageSpy.signalArguments[i * 2][0], 1)
+            canvas.currentPage = 1
+            keyClick(Qt.Key_Escape)
+            keyClick(Qt.Key_Left)
+            compare(pageSpy.count, i * 2 + 2)
+            compare(pageSpy.signalArguments[i * 2 + 1][0], 0)
+            verify(otherFocus.activeFocus)
+        }
     }
 }

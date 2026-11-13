@@ -18,7 +18,6 @@ Item {
             canvas.showHotspot(root, false)
         } else {
             shown = true
-            canvas.forceActiveFocus()
         }
     }
     function close() {
