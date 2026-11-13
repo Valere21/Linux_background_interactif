@@ -1,13 +1,21 @@
-# Hiérarchie Linux interactive
+# Linux interactif
 
-Projet Qt 6.11 / QML pour KDE Plasma 6. Le plugin s'exécute avec la version de Qt utilisée par Plasma.
+Fond d'écran KDE Plasma 6 présentant la hiérarchie et les commandes Linux, avec un panneau d'information fixe. Chaque fiche commence par une définition, suivie d'exemples ; les modules présentent aussi une situation d'application. Le projet s'ouvre dans Qt Creator avec un kit Qt 6.11 ; le plugin utilise la version de Qt de Plasma.
 
-Ouvrir `CMakeLists.txt` dans Qt Creator avec le kit Qt 6.11. Pour installer le fond dans le compte utilisateur :
+Le bouton en haut à droite passe d'une image à l'autre. Lorsque l'interactivité est sur On et que le bureau a le focus, les flèches gauche et droite changent aussi de page : elles peuvent alors remplacer les déplacements entre icônes du bureau. Survolez un dossier, une commande ou un titre de module pour afficher sa fiche ; cliquez pour la maintenir ou la libérer. Échap ferme la fiche. Le panneau affiche une fiche à la fois : un clic sur une autre la sélectionne. La molette permet de parcourir une fiche épinglée trop longue.
+
+Les sources QML sont dans `plugin/contents/ui` : `Entries.js` décrit la hiérarchie, `CommandEntries.js` les zones et fiches de commandes, `SlideDeck.qml` les transitions, `Hotspot.qml` les interactions et `FixedInfoPanel.qml` le panneau.
+
+Installation dans le compte utilisateur, depuis la racine du projet :
 
 ```sh
 kpackagetool6 --type Plasma/Wallpaper --install plugin
 ```
 
-Dans les réglages du bureau, sélectionner le type de fond « Hiérarchie Linux interactive ». Clic droit sur le bureau puis « Activer les infos Linux » pour activer les zones. Un survol affiche une fiche; un clic la maintient ouverte et un second clic la libère. La touche Échap ferme toutes les fiches lorsque le bureau a le focus. Les fiches s’ouvrent du côté disposant de place. Désactiver avec la même action du menu.
+Pour une version déjà installée, utiliser `--upgrade` à la place de `--install`, puis sélectionner « Linux interactif » dans les réglages du fond d'écran. Après une mise à jour des fichiers QML, recharger Plasma pour évacuer son cache.
 
-Les coordonnées, descriptions, exemples et remarques sont dans `plugin/contents/ui/Entries.js`, le comportement et la présentation communs dans `Hotspot.qml`. L'image est intégrée au paquet. Pour revenir au fond initial, sélectionner le type « Image » dans les réglages du bureau.
+Vérification des zones, des transitions et des interactions :
+
+```sh
+QT_QPA_PLATFORM=offscreen /usr/lib64/qt6/bin/qmltestrunner -input tests
+```
