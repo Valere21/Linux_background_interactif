@@ -1,4 +1,5 @@
 import QtQuick
+import "PopupPlacement.js" as Placement
 
 Item {
     id: root
@@ -9,7 +10,16 @@ Item {
     z: shown ? 10 : 0
 
     function scheduleClose() { closeTimer.restart() }
-    function open() { closeTimer.stop(); shown = true }
+    function open() {
+        closeTimer.stop()
+        shown = true
+        canvas.forceActiveFocus()
+    }
+    function close() {
+        closeTimer.stop()
+        pinned = false
+        shown = false
+    }
 
     FolderHighlight {
         width: root.width
@@ -44,8 +54,10 @@ Item {
         visible: root.shown
         width: Math.min(380, root.canvas.width - 16)
         height: column.implicitHeight + 24
-        x: Math.max(-root.x + 8, Math.min(root.width + 8, root.canvas.width - root.x - width - 8))
-        y: Math.max(-root.y + 8, Math.min(0, root.canvas.height - root.y - height - 8))
+        readonly property var placement: Placement.place(root.x, root.y, root.width, root.height,
+                                                           width, height, root.canvas.width, root.canvas.height)
+        x: placement.x
+        y: placement.y
         radius: 9
         color: "#ef101b20"
         border.color: "#54d9e6"

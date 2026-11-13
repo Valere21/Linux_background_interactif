@@ -22,7 +22,7 @@ WallpaperItem {
         fillMode: Image.PreserveAspectFit
         smooth: true
     }
-    Item {
+    InteractiveCanvas {
         id: imageCanvas
         parent: root.parent
         z: 1000
@@ -30,17 +30,6 @@ WallpaperItem {
         height: background.paintedHeight
         anchors.centerIn: parent
         visible: root.interactive
-        Repeater {
-            model: Data.entries
-            Hotspot {
-                required property var modelData
-                entry: modelData
-                canvas: imageCanvas
-                x: modelData.x / 1672 * imageCanvas.width
-                y: modelData.y / 930 * imageCanvas.height
-                width: modelData.w / 1672 * imageCanvas.width
-                height: modelData.h / 930 * imageCanvas.height
-            }
-        }
+        entries: Data.entries
     }
 }
