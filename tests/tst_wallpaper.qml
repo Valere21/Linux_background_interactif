@@ -44,6 +44,8 @@ TestCase {
         let modules = 0, commands = 0
         for (const e of items) {
             verify(e.title && e.description && e.examples.length && e.note)
+            for (const example of e.examples)
+                verify(/\s:\s\S/.test(example), "Chaque exemple doit expliquer son résultat : " + example)
             verify(e.x >= 0 && e.y >= 0 && e.w > 0 && e.h > 0)
             verify(e.x + e.w <= 1671 && e.y + e.h <= 941)
             if (e.kind === "module") {
