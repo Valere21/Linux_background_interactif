@@ -6,7 +6,7 @@ Item {
     id: interactiveLayer
     required property var entries
     property real referenceWidth: 1672
-    property real referenceHeight: 930
+    property real referenceHeight: 941
     property bool fixedPanel: false
     property int currentPage: 0
     property bool shortcutsEnabled: visible
@@ -100,9 +100,9 @@ Item {
         entry: interactiveLayer.activeHotspot ? interactiveLayer.activeHotspot.entry : (interactiveLayer.relatedEntry || ({}))
         accent: interactiveLayer.activeHotspot ? interactiveLayer.activeHotspot.tint
                 : (interactiveLayer.relatedEntry ? EntryColor.forEntry(interactiveLayer.relatedEntry) : "#54d9e6")
-        x: interactiveLayer.width * 610 / 1672
+        x: interactiveLayer.width * 645 / 1672
         y: interactiveLayer.height * 720 / 941
-        width: interactiveLayer.width * 820 / 1672
+        width: interactiveLayer.width * 785 / 1672
         height: interactiveLayer.height * 195 / 941
     }
 }

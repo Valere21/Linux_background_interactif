@@ -77,7 +77,7 @@ WallpaperItem {
         visible: root.interactive && !transitionTimer.running
         shortcutsEnabled: root.interactive
         entries: root.page === 0 ? Hierarchy.entries : Commands.entriesFor()
-        referenceWidth: root.page === 0 ? 1672 : 1671
+        referenceWidth: 1672
         referenceHeight: 941
         fixedPanel: true
         currentPage: root.page
